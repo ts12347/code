@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>COCREA — Gandi (packaged)</title>
+  <style>
+    :root{--bg:#f6f7fb;--card:#fff;--muted:#666;--accent:#0366d6}
+    html,body{height:1000%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{background:var(--bg);display:flex;flex-direction:column}
+    header{background:linear-gradient(90deg,#fff, #f8fbff);padding:1rem 1.25rem;border-bottom:1px solid #e7eaef;display:flex;align-items:center;gap:1rem}
+    header h1{margin:0;font-size:1.05rem}
+    header p{margin:0;color:var(--muted);font-size:.9rem}
+    main{flex:1;padding:1rem;display:flex;flex-direction:column;gap:.75rem;max-width:1200px;margin:0 auto;width:100%}
+    .frame-wrap{flex:1;min-height:60vh;border:1px solid #dfe6f0;border-radius:8px;overflow:hidden;background:#fff}
+    iframe{width:100%;height:100%;border:0;display:block}
+    .fallback{padding:1rem;background:var(--card);border-radius:6px;border:1px dashed #e1e6f0;color:var(--muted)}
+    .actions{display:flex;gap:.5rem;align-items:center}
+    .btn{background:var(--accent);color:#fff;padding:.5rem .75rem;border-radius:6px;text-decoration:none;display:inline-block;font-weight:600}
+    .muted-link{color:var(--accent);text-decoration:none}
+    footer{padding:.75rem;text-align:center;font-size:.85rem;color:var(--muted)}
+    @media (max-width:720px){header{flex-direction:column;align-items:flex-start}main{padding:.75rem}}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>COCREA — Gandi (packaged)</h1>
+      <p>Local wrapper for the Gandi IDE. Requires internet.</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="frame-wrap" id="frameArea">
+      <iframe src="https://cocrea.world/gandi" id="siteFrame" title="COCREA Gandi IDE"></iframe>
+    </div>
+
+    <div class="fallback" id="fallback" style="display:none">
+      <strong>Embedding blocked:</strong>
+      <p>The site blocked embedding in an iframe (common for security). Use the link below to open the live site in a new tab, or create a local snapshot using the instructions provided.</p>
+      <p><span class="muted-link">https://cocrea.world/gandi</span></p>
+    </div>
+
+    <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+      <small style="color:var(--muted)">This packaged file is a simple wrapper. For a true offline snapshot, see the download instructions below.</small>
+    </div>
+
+    <section style="margin-top:.75rem">
+      <h3 style="margin:.20rem 0">If the iframe does not display</h3>
+      <ol style="margin:.5rem 0 .75rem 1.25rem;color:var(--muted)">
+        <li>Open the site in a new tab by visiting https://cocrea.world/gandi</li>
+        <li>To make a local single-file snapshot (partial functionality), use the SingleFile browser extension (recommended) or the commands below.</li>
+      </ol>
+
+      <details>
+        <summary style="cursor:pointer;color:var(--accent)">Commands to make a local snapshot (Linux/macOS)</summary>
+        <pre style="background:#fbfdff;border:1px solid #eef4ff;padding:.75rem;border-radius:6px;white-space:pre-wrap;color:#213">
+# Using wget to mirror (may need adjustments):
+wget --mirror --convert-links --adjust-extension --page-requisites --no-parent https://cocrea.world/gandi -P ./cocrea-gandi-snapshot
+
+# Or use SingleFile extension in your browser to save a single-page HTML with all inlined assets.
+# After saving, create a ZIP:
+cd cocrea-gandi-snapshot
+zip -r ../cocrea-gandi-site.zip . 
+        </pre>
+      </details>
+
+    </section>
+  </main>
+
+  <footer>
+    Packaged by ts12347 — note: full IDE features require the original site's backend and cannot be guaranteed offline.
+  </footer>
+
+  <script>
+    // If the iframe is blocked (X-Frame-Options/CSP), try to detect and show fallback
+    (function(){
+      const iframe = document.getElementById('siteFrame');
+      const fallback = document.getElementById('fallback');
+      // After a short delay, check whether iframe loaded content by trying to access its document
+      setTimeout(()=> {
+        try {
+          const doc = iframe.contentDocument || iframe.contentWindow.document;
+          // If same-origin and loaded, nothing to do. If cross-origin, reading will throw; treat as loaded.
+          // However if the frame failed to load due to X-Frame-Options, it will be empty or display an error.
+          if (!doc || doc.body.innerHTML.length < 20) {
+            fallback.style.display = 'block';
+          }
+        } catch (e) {
+          // Cross-origin access typically throws — but that usually means the iframe loaded successfully.
+          // Still check if the iframe has a reported height of 0 which sometimes indicates a block.
+          if (iframe.clientHeight < 10) fallback.style.display = 'block';
+        }
+      }, 1200);
+    })();
+  </script>
+</body>
+</html>
